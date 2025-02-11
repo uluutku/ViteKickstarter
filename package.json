@@ -1,7 +1,7 @@
 {
-  "name": "create-vite-react",
-  "version": "1.0.0",
-  "bin": "create-vite-react.js",
+  "name": "ViteKickStarter",
+  "version": "1.1.0",
+  "bin": "ViteKickStarter.js",
   "dependencies": {
     "inquirer": "^12.4.1"
   }

@@ -16,7 +16,6 @@ function toKebabCase(str) {
     .join('-');
 }
 
-// Define package templates.
 const commonPackages = [
   '@mui/material',
   '@mui/icons-material',
@@ -29,15 +28,15 @@ const commonPackages = [
   'framer-motion',
   'react-dark-mode-toggle',
   'yup',
-  'formik'
-];
-
-const expandedPackages = [
-  ...commonPackages,
+  'formik',
   'prop-types',
   'classnames',
   'react-helmet',
   'styled-components'
+];
+
+const expandedPackages = [
+  ...commonPackages,
 ];
 
 const fullPackages = [
@@ -111,7 +110,9 @@ async function run() {
     //   │     Header.jsx
     //   │     Footer.jsx
     //   ├── pages/
-    //   │     Home.jsx
+    //   │     Level1.jsx         (always)
+    //   │     Level2.jsx         (if expanded or full)
+    //   │     Level3.jsx         (if full)
     //   │     About.jsx
     //   ├── App.jsx
     //   ├── main.jsx
@@ -126,7 +127,8 @@ async function run() {
     // ---------------------------
     // Write file contents
     // ---------------------------
-    // src/main.jsx – entry point
+
+    // src/main.jsx – entry point remains unchanged
     const mainJSXContent = `import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -140,7 +142,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 `;
     fs.writeFileSync(path.join(srcDir, 'main.jsx'), mainJSXContent, 'utf8');
 
-    // src/main.css – modern CSS with light/dark palettes, typography, spacing, and smooth transitions
+    // src/main.css – modern CSS remains unchanged
     const mainCSSContent = `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
 :root {
@@ -284,14 +286,40 @@ button:hover {
 `;
     fs.writeFileSync(path.join(srcDir, 'main.css'), mainCSSContent, 'utf8');
 
-    // src/App.jsx – manages dark mode via a data attribute and uses flex container for sticky footer
-    const appJSXContent = `import { useState, useEffect } from 'react';
+    // ---------------------------
+    // src/App.jsx – dynamic routing based on chosen packages
+    // ---------------------------
+    let appImports = `import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Home from './pages/Home';
-import About from './pages/About';
+import Level1 from './pages/Level1';
+`;
+    if (templateChoice === 'expanded' || templateChoice === 'full') {
+      appImports += `import Level2 from './pages/Level2';\n`;
+    }
+    if (templateChoice === 'full') {
+      appImports += `import Level3 from './pages/Level3';\n`;
+    }
+    appImports += `import About from './pages/About';
 import './main.css';
+`;
+
+    let appRoutes = `  <Routes>
+    <Route path="/" element={<Level1 />} />
+    <Route path="/level1" element={<Level1 />} />
+`;
+    if (templateChoice === 'expanded' || templateChoice === 'full') {
+      appRoutes += `    <Route path="/level2" element={<Level2 />} />\n`;
+    }
+    if (templateChoice === 'full') {
+      appRoutes += `    <Route path="/level3" element={<Level3 />} />\n`;
+    }
+    appRoutes += `    <Route path="/about" element={<About />} />
+  </Routes>
+`;
+
+    const appJSXContent = `${appImports}
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
@@ -307,11 +335,7 @@ function App() {
       <div className="app-container">
         <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-          </Routes>
-        </main>
+${appRoutes}        </main>
         <Footer />
       </div>
     </Router>
@@ -322,7 +346,19 @@ export default App;
 `;
     fs.writeFileSync(path.join(srcDir, 'App.jsx'), appJSXContent, 'utf8');
 
-    // src/components/Header.jsx – uses classnames, includes a Material icon, and defines PropTypes
+    // ---------------------------
+    // src/components/Header.jsx – update nav links dynamically
+    // ---------------------------
+    // Build nav links based on the chosen template
+    let navLinks = `<Link to="/level1" className="nav-link">Level 1</Link>`;
+    if (templateChoice === 'expanded' || templateChoice === 'full') {
+      navLinks += `\n          <Link to="/level2" className="nav-link">Level 2</Link>`;
+    }
+    if (templateChoice === 'full') {
+      navLinks += `\n          <Link to="/level3" className="nav-link">Level 3</Link>`;
+    }
+    navLinks += `\n          <Link to="/about" className="nav-link">About</Link>`;
+
     const headerJSXContent = `import React from 'react';
 import { Link } from 'react-router-dom';
 import DarkModeToggle from 'react-dark-mode-toggle';
@@ -336,16 +372,11 @@ const Header = ({ darkMode, toggleDarkMode }) => {
       <div className="header-left" style={{ display: 'flex', alignItems: 'center' }}>
         <MenuIcon style={{ marginRight: '0.5rem' }} />
         <nav>
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/about" className="nav-link">About</Link>
+          ${navLinks}
         </nav>
       </div>
       <div>
-        <DarkModeToggle
-          onChange={toggleDarkMode}
-          checked={darkMode}
-          size={60}
-        />
+        <DarkModeToggle onChange={toggleDarkMode} checked={darkMode} size={60} />
       </div>
     </header>
   );
@@ -360,7 +391,9 @@ export default Header;
 `;
     fs.writeFileSync(path.join(componentsDir, 'Header.jsx'), headerJSXContent, 'utf8');
 
-    // src/components/Footer.jsx – sticky footer with PropTypes
+    // ---------------------------
+    // src/components/Footer.jsx – remains unchanged
+    // ---------------------------
     const footerJSXContent = `import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -378,53 +411,24 @@ export default Footer;
 `;
     fs.writeFileSync(path.join(componentsDir, 'Footer.jsx'), footerJSXContent, 'utf8');
 
-    // src/pages/Home.jsx – comprehensive package showcase with modern layout and animations
-    const homeJSXContent = `import React, { useState, Suspense } from 'react';
+    // ---------------------------
+    // src/pages/Level1.jsx – Common packages demo page
+    // ---------------------------
+    const level1JSXContent = `import React, { useState } from 'react';
 import { Button } from '@mui/material';
-import { FaReact } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import _ from 'lodash';
-import styled from 'styled-components';
-import dayjs from 'dayjs';
-import * as yup from 'yup';
-import { produce } from 'immer';
-import useSWR from 'swr';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as yup from 'yup';
 
-// Dynamically import react-confetti
-const LazyConfetti = React.lazy(() =>
-  import('react-confetti').catch(() => ({ default: () => null }))
-);
-
-// SWR fetcher function
-const fetcher = url => axios.get(url).then(res => res.data);
-
-// Styled container
-const ShowcaseContainer = styled.div\`
-  padding: 2rem;
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto;
-\`;
-
-// Yup validation schema for the Formik demo
 const formSchema = yup.object().shape({
   username: yup.string().required('Username is required').min(3, 'Must be at least 3 characters'),
   email: yup.string().required('Email is required').email('Invalid email format')
 });
 
-function Home() {
-  const [confettiActive, setConfettiActive] = useState(false);
+const Level1 = () => {
   const [apiData, setApiData] = useState(null);
-  const [immerData, setImmerData] = useState({ value: 0 });
-  const { data: jokeData, error: jokeError } = useSWR('https://api.chucknorris.io/jokes/random', fetcher);
-
-  // Handlers
-  const handleConfetti = () => {
-    setConfettiActive(true);
-    setTimeout(() => setConfettiActive(false), 3000);
-  };
 
   const fetchAPIData = async () => {
     try {
@@ -436,30 +440,14 @@ function Home() {
     }
   };
 
-  const handleImmerDemo = () => {
-    setImmerData(produce(draft => {
-      draft.value += 1;
-    }));
-  };
-
   return (
-    <ShowcaseContainer>
-      <h1>Package Showcase</h1>
-      <p>Today is {dayjs().format('MMMM D, YYYY')}</p>
+    <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <h1>Level 1 Package Demo</h1>
       <motion.div animate={{ scale: 1.1 }} transition={{ duration: 0.5 }}>
-        <FaReact size={64} color="#61dafb" />
+        <p>Animated content with Framer Motion!</p>
       </motion.div>
-
-      {/* MUI Button + React Confetti */}
       <div style={{ margin: '1rem' }}>
-        <Button variant="contained" color="primary" onClick={handleConfetti}>
-          MUI Button & Confetti!
-        </Button>
-      </div>
-
-      {/* Axios & Lodash API fetch demo */}
-      <div style={{ margin: '1rem' }}>
-        <Button variant="outlined" onClick={fetchAPIData}>
+        <Button variant="contained" color="primary" onClick={fetchAPIData}>
           Fetch API Data (axios & lodash)
         </Button>
       </div>
@@ -469,24 +457,8 @@ function Home() {
           <pre>{JSON.stringify(apiData, null, 2)}</pre>
         </div>
       )}
-
-      {/* SWR demo for random joke */}
-      <div style={{ margin: '1rem' }}>
-        <h2>Random Joke (SWR):</h2>
-        {jokeError && <p>Error loading joke.</p>}
-        {jokeData ? <p>{jokeData.value}</p> : <p>Loading joke...</p>}
-      </div>
-
-      {/* Immer demo */}
-      <div style={{ margin: '1rem' }}>
-        <h2>Immer Demo:</h2>
-        <p>Value: {immerData.value}</p>
-        <Button variant="outlined" onClick={handleImmerDemo}>Increase Value (Immer)</Button>
-      </div>
-
-      {/* Formik + Yup Form Validation Demo */}
       <div style={{ margin: '1rem', textAlign: 'left' }}>
-        <h2>Formik + Yup Form Validation Demo:</h2>
+        <h2>Formik + Yup Form Demo:</h2>
         <Formik
           initialValues={{ username: '', email: '' }}
           validationSchema={formSchema}
@@ -513,20 +485,113 @@ function Home() {
           )}
         </Formik>
       </div>
+    </div>
+  );
+};
 
-      {/* React Confetti */}
+export default Level1;
+`;
+    fs.writeFileSync(path.join(pagesDir, 'Level1.jsx'), level1JSXContent, 'utf8');
+
+    // ---------------------------
+    // src/pages/Level2.jsx – Expanded packages demo page (if applicable)
+    // ---------------------------
+    if (templateChoice === 'expanded' || templateChoice === 'full') {
+      const level2JSXContent = `import React from 'react';
+import { Helmet } from 'react-helmet';
+import styled from 'styled-components';
+
+const StyledContainer = styled.div\`
+  padding: 2rem;
+  text-align: center;
+  background: #f0f0f0;
+  border-radius: 8px;
+\`;
+
+const Level2 = () => {
+  return (
+    <StyledContainer>
+      <Helmet>
+        <title>Level 2 Demo - Expanded Packages</title>
+      </Helmet>
+      <h1>Level 2 Package Demo</h1>
+      <p>This demo uses react-helmet and styled-components.</p>
+    </StyledContainer>
+  );
+};
+
+export default Level2;
+`;
+      fs.writeFileSync(path.join(pagesDir, 'Level2.jsx'), level2JSXContent, 'utf8');
+    }
+
+    // ---------------------------
+    // src/pages/Level3.jsx – Full packages demo page (if applicable)
+    // ---------------------------
+    if (templateChoice === 'full') {
+      const level3JSXContent = `import React, { useState, Suspense } from 'react';
+import dayjs from 'dayjs';
+import useSWR from 'swr';
+import axios from 'axios';
+import { produce } from 'immer';
+import { Button } from '@mui/material';
+
+const fetcher = url => axios.get(url).then(res => res.data);
+
+const LazyConfetti = React.lazy(() =>
+  import('react-confetti').catch(() => ({ default: () => null }))
+);
+
+const Level3 = () => {
+  const [confettiActive, setConfettiActive] = useState(false);
+  const [immerData, setImmerData] = useState({ count: 0 });
+  const { data: jokeData, error: jokeError } = useSWR('https://api.chucknorris.io/jokes/random', fetcher);
+
+  const handleConfetti = () => {
+    setConfettiActive(true);
+    setTimeout(() => setConfettiActive(false), 3000);
+  };
+
+  const handleImmerDemo = () => {
+    setImmerData(produce(draft => {
+      draft.count += 1;
+    }));
+  };
+
+  return (
+    <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <h1>Level 3 Package Demo</h1>
+      <p>Today is {dayjs().format('MMMM D, YYYY')}</p>
+      <div style={{ margin: '1rem' }}>
+        <Button variant="contained" color="primary" onClick={handleConfetti}>
+          Trigger Confetti!
+        </Button>
+      </div>
       <Suspense fallback={<div>Loading Confetti...</div>}>
         {confettiActive && <LazyConfetti width={window.innerWidth} height={window.innerHeight} />}
       </Suspense>
-    </ShowcaseContainer>
+      <div style={{ margin: '1rem' }}>
+        <h2>Random Joke (SWR):</h2>
+        {jokeError && <p>Error loading joke.</p>}
+        {jokeData ? <p>{jokeData.value}</p> : <p>Loading joke...</p>}
+      </div>
+      <div style={{ margin: '1rem' }}>
+        <h2>Immer Demo:</h2>
+        <p>Count: {immerData.count}</p>
+        <Button variant="outlined" onClick={handleImmerDemo}>Increase Count (Immer)</Button>
+      </div>
+    </div>
   );
-}
+};
 
-export default Home;
+export default Level3;
 `;
-    fs.writeFileSync(path.join(pagesDir, 'Home.jsx'), homeJSXContent, 'utf8');
+      fs.writeFileSync(path.join(pagesDir, 'Level3.jsx'), level3JSXContent, 'utf8');
+    }
 
-    // src/pages/About.jsx – simple About page with react-helmet
+    // ---------------------------
+    // src/pages/About.jsx – About page remains mostly unchanged
+    // ---------------------------
     const aboutJSXContent = `import React from 'react';
 import { Helmet } from 'react-helmet';
 
@@ -548,7 +613,15 @@ export default About;
 
     console.log('\nProject files and folder structure updated successfully!');
 
+    // ---------------------------
+    // Open the code editor (VS Code) in the project folder
+    // ---------------------------
+    console.log('\nOpening your project in VS Code...');
+    spawn('code', ['.'], { stdio: 'inherit', shell: true });
+
+    // ---------------------------
     // Start the development server (detached so it keeps running)
+    // ---------------------------
     console.log('\nStarting development server...');
     const devProcess = spawn('npm', ['run', 'dev'], {
       stdio: 'inherit',
@@ -568,7 +641,8 @@ export default About;
     }
     spawn(openCommand, [`http://localhost:${port}`], {
       stdio: 'ignore',
-      detached: true
+      detached: true,
+      shell: true
     });
 
     console.log('\nYour Vite + React project is ready and the dev server is running!');
