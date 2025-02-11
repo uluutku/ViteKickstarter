@@ -1,0 +1,8 @@
+{
+  "name": "create-vite-react",
+  "version": "1.0.0",
+  "bin": "create-vite-react.js",
+  "dependencies": {
+    "inquirer": "^12.4.1"
+  }
+}
