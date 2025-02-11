@@ -4,8 +4,7 @@ Hey there! 😊
 
 I built ViteKickstarter because sometimes I need a fast, modern starter for my Vite + React projects.
 
-Even the Vite create command is very helpful, but you still need to answer some questions, install packages, and update Vite template pages manually. 
-
+Even the Vite create command is very helpful, but you still need to answer some questions, install packages, and update Vite template pages manually.
 This script basically asks for your project name and lets you select one of several package lists, and then it does everything automatically:
 
 - Installs the necessary basic packages.
@@ -15,9 +14,9 @@ This script basically asks for your project name and lets you select one of seve
 - Runs the project in dev mode.
 - Opens the project in your browser.
 
-  * All folder structures and packages are set up according to my preferences, but you can easily edit them in the script file.
+ All folder structures and packages are set up according to my preferences, but you can easily edit them in the script file.
 
-  * There is also an .exe version of the script that you can simply run by double-clicking it.
+ There is also an .exe version of the script that you can simply run by double-clicking it.
 
 ---
 
@@ -59,7 +58,7 @@ This script basically asks for your project name and lets you select one of seve
 ## Dependencies
 
 - **Node.js:**  
-  Ensure Node.js is installed (v18 or later recommended). Check by running:
+  Ensure Node.js is installed (v12 or later recommended). Check by running:
   
       node -v
 
@@ -148,7 +147,48 @@ Follow these steps to use ViteKickstarter:
 
 ---
 
+## For Complete Beginners
+
+If you're new to development and have zero prior knowledge, don't worry—here's a simple guide to get you started:
+
+1. **Installing Node.js:**
+   - Visit [nodejs.org](https://nodejs.org/en/) and download the LTS (Long Term Support) version.
+   - Follow the installation instructions for your operating system.
+   - Verify the installation by opening your terminal (or Command Prompt on Windows) and running:
+     
+         node -v
+
+2. **Understanding NPM:**
+   - NPM (Node Package Manager) is installed automatically with Node.js.
+   - It is used to manage packages (libraries) required by your project.
+   - You can check if it’s installed by running:
+     
+         npm -v
+
+3. **Using ViteKickstarter:**
+   - Once Node.js and NPM are installed, follow the **Installation** steps above to clone the repository and install dependencies.
+   - Run the script as described in the **Usage** section.
+   - The script will guide you through setting up your project interactively.
+
+4. **.exe Version:**
+   - If you prefer not to work in the terminal, you can use the .exe version of ViteKickstarter.
+   - Download the .exe file from the [main branch](https://github.com/uluutku/ViteKickstarter/) page.
+   - Simply place the .exe file in the root of your project folder and double-click it to run.
+   - The .exe version automates the same process without needing to open a command prompt.
+
+5. **Additional Learning Resources:**
+   - **Node.js Official Documentation:** [https://nodejs.org/en/docs/](https://nodejs.org/en/docs/)
+   - **NPM Documentation:** [https://docs.npmjs.com/](https://docs.npmjs.com/)
+   - **Beginner Tutorials:**  
+     - [FreeCodeCamp Node.js Tutorial](https://www.freecodecamp.org/news/learn-node-js-full-course/)
+     - [W3Schools Node.js Tutorial](https://www.w3schools.com/nodejs/)
+
+---
+
 ## Troubleshooting
+
+# Important Note: 
+ * Template pages designed for using package 3 (biggest one) option and it is *normal* to give errors in lower packages. Since you will change theese pages quickly anyway, i didnt add custom pages for each package level.
 
 1. **Setup Errors:**  
    - If you encounter any issues during setup, make sure your internet connection is stable and that Node.js and npm are correctly installed.
@@ -175,3 +215,4 @@ Contributions are welcome! To contribute:
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for more details.
+```sh
