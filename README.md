@@ -5,6 +5,7 @@ Hey there! 😊
 I built ViteKickstarter because sometimes I need a fast, modern starter for my Vite + React projects.
 
 Even the Vite create command is very helpful, but you still need to answer some questions, install packages, and update Vite template pages manually.
+
 This script basically asks for your project name and lets you select one of several package lists, and then it does everything automatically:
 
 - Installs the necessary basic packages.
